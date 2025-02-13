@@ -9,7 +9,7 @@ export default function SignUpScreen() {
   const navigate = useNavigate();
   const { search } = useLocation();
   const redirectIntUrl = new URLSearchParams(search).get("redirect");
-  const redirect = redirectIntUrl ? redirectIntUrl : "/";
+  const redirect = redirectIntUrl ? redirectIntUrl : "/signin";
   const [username, setUsername] = useState({ value: "", isTouched: false });
   const [password, setPassword] = useState({ value: "", isTouched: false });
   const [role, setRole] = useState({ value: "", isTouched: false });

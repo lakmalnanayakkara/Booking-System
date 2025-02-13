@@ -4,6 +4,7 @@ import com.AppointmentsBookingSystem.backend.dto.StandardResponse;
 import com.AppointmentsBookingSystem.backend.exception.BadCredentialsException;
 import com.AppointmentsBookingSystem.backend.exception.NotFoundException;
 import com.AppointmentsBookingSystem.backend.exception.RegisterFailedException;
+import com.AppointmentsBookingSystem.backend.exception.ValidationFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,15 @@ public class AppWideExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<StandardResponse> handleBadCredentialsException(Exception ex){
+        ResponseEntity<StandardResponse> response = new ResponseEntity<>(
+                new StandardResponse(400,"BAD_REQUEST",ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+        return response;
+    }
+
+    @ExceptionHandler(ValidationFailedException.class)
+    public ResponseEntity<StandardResponse> handleValidationFailedException(Exception ex){
         ResponseEntity<StandardResponse> response = new ResponseEntity<>(
                 new StandardResponse(400,"BAD_REQUEST",ex.getMessage()),
                 HttpStatus.BAD_REQUEST

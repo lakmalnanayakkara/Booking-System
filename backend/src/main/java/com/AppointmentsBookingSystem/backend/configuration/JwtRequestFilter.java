@@ -1,5 +1,7 @@
 package com.AppointmentsBookingSystem.backend.configuration;
 
+import com.AppointmentsBookingSystem.backend.exception.BadCredentialsException;
+import com.AppointmentsBookingSystem.backend.exception.ValidationFailedException;
 import com.AppointmentsBookingSystem.backend.service.implementation.UserServiceIMPL;
 import com.AppointmentsBookingSystem.backend.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -31,15 +33,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
+        String requestURI = request.getRequestURI();
+        if (requestURI.contains("/api/v1/user/sign-up") || requestURI.contains("/api/v1/user/sign-in")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtUtil.getUserNameFromToken(jwtToken);
             }catch (Exception e) {
-                System.out.println(e.getMessage());
+                throw new BadCredentialsException("Error extracting username from token");
             }
         }else {
-            System.out.println("AAA");
+            throw new ValidationFailedException("Invalid or missing Authorization header");
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -53,6 +61,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 );
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            }else {
+                throw new ValidationFailedException("JWT validation failed");
             }
         }
 

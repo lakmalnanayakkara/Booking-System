@@ -21,8 +21,8 @@ public class AppointmentDetails {
     @Column(name = "appointment_title", nullable = false)
     private String appointmentTitle;
 
-    @Column(name = "user_name", nullable = false)
-    private String userName;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "user_email", nullable = false)
     private String email;
@@ -41,4 +41,7 @@ public class AppointmentDetails {
 
     @Column(name = "meeting_type", nullable = false)
     private String meetingType;
+
+    @Column(name = "user_name", nullable = false)
+    private String username;
 }

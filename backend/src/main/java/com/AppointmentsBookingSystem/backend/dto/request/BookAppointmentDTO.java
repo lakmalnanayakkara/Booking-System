@@ -12,11 +12,12 @@ import java.time.LocalTime;
 @Data
 public class BookAppointmentDTO {
     private String appointmentTitle;
-    private String userName;
+    private String name;
     private String email;
     private String contactNumber;
     private LocalDate appointmentDate;
     private LocalTime startingTime;
     private LocalTime endingTime;
     private String meetingType;
+    private String username;
 }

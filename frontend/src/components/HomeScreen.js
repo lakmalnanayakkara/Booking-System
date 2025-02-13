@@ -1,60 +1,81 @@
-import React, { useContext, useEffect, useState } from "react";
-import NavBarScreen from "./NavBarScreen";
-import { Store } from "../Store";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { Store } from "../Store";
+import axios from "axios";
+import LoadingBox from "../utils/LoadingBox";
+import MessageBox from "../utils/MessageBox";
+import { Col, Row } from "react-bootstrap";
+import Appointment from "../utils/Appointment";
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "FETCH_REQUEST":
+      return { ...state, loading: true };
+    case "FETCH_SUCCESS":
+      return { ...state, appointments: action.payload, loading: false };
+    case "FETCH_FAIL":
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 export default function HomeScreen() {
   const navigate = useNavigate();
   const { state } = useContext(Store);
   const { userInfo } = state;
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [availableSlots, setAvailableSlots] = useState([]);
-
+  const [{ loading, error, appointments }, dispatch] = useReducer(reducer, {
+    appointments: [],
+    loading: true,
+    error: "",
+  });
   useEffect(() => {
     if (userInfo == null) {
       navigate("/signin");
+    } else {
+      const fetchData = async () => {
+        dispatch({ type: "FETCH_REQUEST" });
+        try {
+          const { data } = await axios.get(
+            `/api/v1/appointment/get-user-appointments?username=${userInfo.data.username}&page=0`,
+            {
+              headers: {
+                Authorization: `Bearer ${userInfo.data.jwtToken}`,
+              },
+            }
+          );
+
+          dispatch({ type: "FETCH_SUCCESS", payload: data.data.appointments });
+        } catch (error) {
+          dispatch({ type: "FETCH_FAIL", payload: error.message });
+        }
+      };
+      fetchData();
     }
   }, [navigate, userInfo]);
-
-  // Mock available time slots for demonstration
-  const mockSlots = {
-    "2025-02-12": ["10:00 AM", "11:00 AM", "2:00 PM"],
-    "2025-02-13": ["9:00 AM", "1:00 PM", "3:00 PM"],
-  };
-
-  useEffect(() => {
-    // Format selected date to YYYY-MM-DD
-    const formattedDate = selectedDate.toISOString().split("T")[0];
-    setAvailableSlots(mockSlots[formattedDate] || []);
-  }, [selectedDate]);
-
   return (
-    <div className="d-flex w-100">
-      <NavBarScreen />
-      {/* Side Menu */}
-      <div
-        className="side-menu p-3 border"
-        style={{ width: "300px", background: "#f8f9fa" }}
-      >
-        <h5>Select a Date</h5>
-        <Calendar onChange={setSelectedDate} value={selectedDate} />
-        <h6 className="mt-3">
-          Available Slots on {selectedDate.toDateString()}:
-        </h6>
-        <ul className="list-group">
-          {availableSlots.length > 0 ? (
-            availableSlots.map((slot, index) => (
-              <li key={index} className="list-group-item">
-                {slot}
-              </li>
-            ))
-          ) : (
-            <li className="list-group-item text-danger">No Slots Available</li>
-          )}
-        </ul>
+    <div>
+      <h1>My Appointments</h1>
+      <div className="d-flex flex-wrap">
+        {loading ? (
+          <LoadingBox />
+        ) : error ? (
+          <MessageBox variant="danger">{error}</MessageBox>
+        ) : (
+          <Row className="w-100 mt-4">
+            {appointments.map((appointment) => (
+              <Col
+                key={appointment.appointmentId}
+                sm={6}
+                md={4}
+                lg={3}
+                className="mb-3"
+              >
+                <Appointment appointment={appointment} />
+              </Col>
+            ))}
+          </Row>
+        )}
       </div>
     </div>
   );

@@ -6,3 +6,54 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.site-container {
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.dropdown-menu {
+  background-color: transparent;
+  border: none;
+}
+
+.dropdown-item {
+  background-color: rgba(33, 37, 41, 1);
+  color: #fff;
+}
+
+/*side bar*/
+.navbar-brand {
+  font-weight: bold;
+}
+.side-navbar {
+  position: fixed;
+  width: 240px;
+  height: calc(100vh - 3rem);
+  left: -300px;
+  background-color: rgba(33, 37, 41, 1);
+  transition: 0.5s;
+}
+/* @media (max-width: 769px) {
+  .active-nav {
+    width: 100%;
+  }
+} */
+
+.nav-item:hover {
+  cursor: pointer;
+}
+
+.site-container {
+  transition: 0.4s;
+}
+.active-cont {
+  margin-left: 240px;
+}
+
+.active-nav {
+  left: 0px;
+}
