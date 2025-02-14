@@ -13,8 +13,6 @@ public interface AppointmentDetailsService {
 
     BookAppointmentResponseDTO updateAnAppointment(BookAppointmentDTO bookAppointmentDTO, int appointmentID);
 
-    BookAppointmentResponseDTO deleteAnAppointment(int appointmentID);
-
     AppointmentsPaginatedDTO getAllAppointments(int pageNumber);
 
     AppointmentsPaginatedDTO getAllAppointmentsOfParticularUser(String userName, int pageNumber);
@@ -22,4 +20,8 @@ public interface AppointmentDetailsService {
     BookAppointmentResponseDTO getAnAppointment(int appointmentID);
 
     List<GetTimeSlotDTO> getAllTimeSlotsForParticularDay(LocalDate appointmentDate);
+
+    BookAppointmentResponseDTO anAppointmentDelete(int appointmentID);
+
+    BookAppointmentResponseDTO deleteAnAppointment(int appointmentID);
 }

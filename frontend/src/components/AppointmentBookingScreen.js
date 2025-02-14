@@ -31,6 +31,7 @@ export default function AppointmentBookingScreen() {
       error: "",
     }
   );
+  const [timeSlots, setTimeSlots] = useState([]);
   const [title, setTopic] = useState({
     value: "",
     isTouched: false,
@@ -146,6 +147,39 @@ export default function AppointmentBookingScreen() {
     });
   };
 
+  const isSlotAvailable = (
+    inputStartTime,
+    inputEndTime,
+    existingAppointments
+  ) => {
+    const timeToMinutes = (time) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+
+    const inputStart = timeToMinutes(inputStartTime);
+    const inputEnd = timeToMinutes(inputEndTime);
+
+    if (inputEnd <= inputStart) {
+      return false;
+    }
+
+    for (const appointment of existingAppointments) {
+      const existingStart = timeToMinutes(appointment.startingTime);
+      const existingEnd = timeToMinutes(appointment.endingTime);
+
+      if (
+        (inputStart >= existingStart && inputStart < existingEnd) ||
+        (inputEnd > existingStart && inputEnd <= existingEnd) ||
+        (inputStart <= existingStart && inputEnd >= existingEnd)
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const updateData = async () => {
     try {
       const { data } = await axios.put(
@@ -202,8 +236,12 @@ export default function AppointmentBookingScreen() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    id ? updateData() : submitData();
-    clearForm();
+    if (isSlotAvailable(start.value, end.value, timeSlots)) {
+      id ? updateData() : submitData();
+      clearForm();
+    } else {
+      toast.error("Invalid Start and End time.Check Available time slots.");
+    }
   };
 
   useEffect(() => {
@@ -217,10 +255,33 @@ export default function AppointmentBookingScreen() {
       setName({ value: appointmentToUpdate.name });
       setType({ value: appointmentToUpdate.meetingType });
     };
+
+    const fetchSlots = async () => {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+      const day = String(date.getDate()).padStart(2, "0");
+
+      const formattedDate = `${year}-${month}-${day}`;
+
+      const { data } = await axios.get(
+        `/api/v1/appointment/get-time-slots?date=${
+          appointment.value === "" ? formattedDate : appointment.value
+        }`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.data.jwtToken}`,
+          },
+        }
+      );
+      setTimeSlots(data.data);
+    };
+
+    fetchSlots();
     dispatch({ type: "FETCH_REQUEST" });
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(
+        const { data1 } = await axios.get(
           `/api/v1/appointment/get-an-appointment?id=${id}`,
           {
             headers: {
@@ -229,7 +290,7 @@ export default function AppointmentBookingScreen() {
           }
         );
         await updateForm();
-        dispatch({ type: "FETCH_SUCCESS", payload: data.data });
+        dispatch({ type: "FETCH_SUCCESS", payload: data1.data });
       } catch (error) {
         dispatch({ type: "FETCH_FAIL", payload: error.message });
       }
@@ -249,6 +310,7 @@ export default function AppointmentBookingScreen() {
     appointmentToUpdate.name,
     appointmentToUpdate.startingTime,
     appointmentToUpdate.appointmentDate,
+    appointment.value,
   ]);
 
   return (
@@ -392,7 +454,11 @@ export default function AppointmentBookingScreen() {
                 onBlur={(e) => setEnd({ value: end.value, isTouched: true })}
               ></Form.Control>
               <small className="text-danger">
-                {validateField("End Time", end)}
+                {validateField("End Time", {
+                  existingSlots: timeSlots,
+                  inputStartTime: start,
+                  inputEndTime: end,
+                })}
               </small>
             </Form.Group>
             <Form.Group className="mt-3">

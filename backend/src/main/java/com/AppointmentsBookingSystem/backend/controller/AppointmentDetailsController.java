@@ -58,7 +58,7 @@ public class AppointmentDetailsController {
     @DeleteMapping(path = "/delete-an-appointment", params = "id")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<StandardResponse> deleteAnAppointment(@RequestParam(value = "id") int appointmentID) {
-        BookAppointmentResponseDTO bookAppointmentResponseDTO = appointmentDetailsService.deleteAnAppointment(appointmentID);
+        BookAppointmentResponseDTO bookAppointmentResponseDTO = appointmentDetailsService.anAppointmentDelete(appointmentID);
         ResponseEntity<StandardResponse> response = new ResponseEntity<>(
                 new StandardResponse(201,"SUCCESSFUL",bookAppointmentResponseDTO),
                 HttpStatus.OK

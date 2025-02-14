@@ -57,10 +57,7 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
         AppointmentDetails appointmentDetails = appointmentDetailsRepository.getReferenceById(appointmentID);
         if(appointmentDetails != null){
             appointmentDetailsRepository.delete(appointmentDetails);
-
             BookAppointmentResponseDTO bookAppointmentResponseDTO = appointmentDetailsMapper.appointmentDetailsToBookAppointmentResponseDTO(appointmentDetails);
-            System.out.println('1'+appointmentDetails.getName());
-            System.out.println('2'+appointmentDetails.getName());
             return bookAppointmentResponseDTO;
         }else {
             throw new NotFoundException("Appointment couldn't found.");
@@ -69,7 +66,7 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
 
     @Override
     public AppointmentsPaginatedDTO getAllAppointments(int pageNumber) {
-        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAll(PageRequest.of(pageNumber,10*pageNumber));
+        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAll(PageRequest.of(pageNumber,1));
         long total = appointmentDetailsRepository.count();
         if(appointmentDetails.getSize()>0){
             List<BookAppointmentResponseDTO> bookAppointmentResponseDTOList = appointmentDetailsMapper.pageableAppointmentDetailsToBookAppointmentResponseDTOList(appointmentDetails);
@@ -82,9 +79,8 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
 
     @Override
     public AppointmentsPaginatedDTO getAllAppointmentsOfParticularUser(String userName, int pageNumber) {
-        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAllByUsername(userName,PageRequest.of(pageNumber,10));
+        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAllByUsername(userName,PageRequest.of(pageNumber,5));
         long total = appointmentDetailsRepository.countAppointmentDetailsByUsername(userName);
-        System.out.println(appointmentDetails.getSize());
         if(total>0){
             List<BookAppointmentResponseDTO> bookAppointmentResponseDTOList = appointmentDetailsMapper.pageableAppointmentDetailsToBookAppointmentResponseDTOList(appointmentDetails);
             return new AppointmentsPaginatedDTO(bookAppointmentResponseDTOList, total);
@@ -117,5 +113,17 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
             getTimeSlotDTOList.add(getTimeSlotDTO);
         }
         return getTimeSlotDTOList;
+    }
+
+    @Override
+    public BookAppointmentResponseDTO anAppointmentDelete(int appointmentID) {
+        AppointmentDetails appointmentDetails = appointmentDetailsRepository.getReferenceById(appointmentID);
+        if(appointmentDetails != null){
+            appointmentDetailsRepository.delete(appointmentDetails);
+            BookAppointmentResponseDTO bookAppointmentResponseDTO = appointmentDetailsMapper.appointmentDetailsToBookAppointmentResponseDTO(appointmentDetails);
+            return bookAppointmentResponseDTO;
+        }else {
+            throw new NotFoundException("Appointment couldn't found.");
+        }
     }
 }

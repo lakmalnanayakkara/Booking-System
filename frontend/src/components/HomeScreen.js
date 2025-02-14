@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Store } from "../Store";
 import axios from "axios";
 import LoadingBox from "../utils/LoadingBox";
 import MessageBox from "../utils/MessageBox";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import Appointment from "../utils/Appointment";
 
 const reducer = (state, action) => {
@@ -22,6 +22,7 @@ const reducer = (state, action) => {
 
 export default function HomeScreen() {
   const navigate = useNavigate();
+  const [page, setPage] = useState(0);
   const { state } = useContext(Store);
   const { userInfo } = state;
   const [{ loading, error, appointments }, dispatch] = useReducer(reducer, {
@@ -36,26 +37,60 @@ export default function HomeScreen() {
       const fetchData = async () => {
         dispatch({ type: "FETCH_REQUEST" });
         try {
-          const { data } = await axios.get(
-            `/api/v1/appointment/get-user-appointments?username=${userInfo.data.username}&page=0`,
-            {
-              headers: {
-                Authorization: `Bearer ${userInfo.data.jwtToken}`,
-              },
-            }
-          );
+          if (userInfo.data.role === "user") {
+            const { data } = await axios.get(
+              `/api/v1/appointment/get-user-appointments?username=${userInfo.data.username}&page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${userInfo.data.jwtToken}`,
+                },
+              }
+            );
+            dispatch({
+              type: "FETCH_SUCCESS",
+              payload: data.data.appointments,
+            });
+          } else {
+            console.log(page);
+            dispatch({ type: "FETCH_REQUEST" });
+            const { data } = await axios.get(
+              `/api/v1/appointment/get-all-appointments?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${userInfo.data.jwtToken}`,
+                },
+              }
+            );
+            console.log(data);
 
-          dispatch({ type: "FETCH_SUCCESS", payload: data.data.appointments });
+            dispatch({
+              type: "FETCH_SUCCESS",
+              payload: data.data.appointments,
+            });
+          }
         } catch (error) {
-          dispatch({ type: "FETCH_FAIL", payload: error.message });
+          dispatch({ type: "FETCH_FAIL", payload: "No Any Appointments" });
         }
       };
       fetchData();
     }
-  }, [navigate, userInfo]);
+  }, [navigate, userInfo, page]);
   return (
     <div>
       <h1>My Appointments</h1>
+      <Form className="d-flex flex-row m-2 justify-content-end">
+        <Form.Group>
+          <Form.Control
+            type="number"
+            required
+            value={page}
+            onChange={(e) => setPage(e.target.value)}
+          ></Form.Control>
+        </Form.Group>
+        {/* <Button type="submit" variant="primary" className="ms-2">
+          Get Page
+        </Button> */}
+      </Form>
       <div className="d-flex flex-wrap">
         {loading ? (
           <LoadingBox />

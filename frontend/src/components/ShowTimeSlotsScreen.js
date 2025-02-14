@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { Badge, Button, Card, Form } from "react-bootstrap";
 import LoadingBox from "../utils/LoadingBox";
 import MessageBox from "../utils/MessageBox";
@@ -36,8 +36,6 @@ export default function ShowTimeSlotsScreen() {
     e.preventDefault();
     dispatch({ type: "FETCH_REQUEST" });
     try {
-      console.log(appointment.value);
-
       const { data } = await axios.get(
         `/api/v1/appointment/get-time-slots?date=${appointment.value}`,
         {
@@ -46,13 +44,13 @@ export default function ShowTimeSlotsScreen() {
           },
         }
       );
-      console.log(data);
 
       dispatch({ type: "FETCH_SUCCESS", payload: data.data });
     } catch (error) {
       dispatch({ type: "FETCH_FAIL", payload: error.message });
     }
   };
+
   return (
     <>
       <Form onSubmit={submitHandler} className="d-flex flex-row mt-3">

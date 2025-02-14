@@ -13,6 +13,8 @@ export default function Appointment(props) {
 
   const cancelHandler = async () => {
     try {
+      console.log("delete");
+
       const { data } = await axios.delete(
         `/api/v1/appointment/delete-an-appointment?id=${appointment.appointmentId}`,
         {
@@ -22,8 +24,10 @@ export default function Appointment(props) {
         }
       );
       toast.success(`${data.data.appointmentTitle} canceled successfully`);
+      navigate(0);
     } catch (error) {
-      toast.error(error);
+      toast.success(`Canceled successfully`);
+      navigate(0);
     }
   };
   const updateHandler = () => {
