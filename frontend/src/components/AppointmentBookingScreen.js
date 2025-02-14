@@ -246,14 +246,14 @@ export default function AppointmentBookingScreen() {
 
   useEffect(() => {
     const updateForm = async () => {
-      setTopic({ value: appointmentToUpdate.appointmentTitle });
-      setAppointmentDate({ value: appointmentToUpdate.appointmentDate });
-      setContact({ value: appointmentToUpdate.contactNumber });
-      setEmail({ value: appointmentToUpdate.email });
-      setStart({ value: appointmentToUpdate.startingTime });
-      setEnd({ value: appointmentToUpdate.endingTime });
-      setName({ value: appointmentToUpdate.name });
-      setType({ value: appointmentToUpdate.meetingType });
+      setTopic({ value: appointmentToUpdate?.appointmentTitle });
+      setAppointmentDate({ value: appointmentToUpdate?.appointmentDate });
+      setContact({ value: appointmentToUpdate?.contactNumber });
+      setEmail({ value: appointmentToUpdate?.email });
+      setStart({ value: appointmentToUpdate?.startingTime });
+      setEnd({ value: appointmentToUpdate?.endingTime });
+      setName({ value: appointmentToUpdate?.name });
+      setType({ value: appointmentToUpdate?.meetingType });
     };
 
     const fetchSlots = async () => {
@@ -266,31 +266,34 @@ export default function AppointmentBookingScreen() {
 
       const { data } = await axios.get(
         `/api/v1/appointment/get-time-slots?date=${
-          appointment.value === "" ? formattedDate : appointment.value
+          appointment.value === "" || appointment.value === undefined
+            ? formattedDate
+            : appointment.value
         }`,
         {
           headers: {
-            Authorization: `Bearer ${userInfo.data.jwtToken}`,
+            Authorization: `Bearer ${userInfo?.data.jwtToken}`,
           },
         }
       );
-      setTimeSlots(data.data);
+      setTimeSlots(data?.data);
     };
 
     fetchSlots();
+
     dispatch({ type: "FETCH_REQUEST" });
     const fetchData = async () => {
       try {
-        const { data1 } = await axios.get(
+        const { data } = await axios.get(
           `/api/v1/appointment/get-an-appointment?id=${id}`,
           {
             headers: {
-              Authorization: `Bearer ${userInfo.data.jwtToken}`,
+              Authorization: `Bearer ${userInfo?.data.jwtToken}`,
             },
           }
         );
-        await updateForm();
-        dispatch({ type: "FETCH_SUCCESS", payload: data1.data });
+        dispatch({ type: "FETCH_SUCCESS", payload: data?.data });
+        updateForm();
       } catch (error) {
         dispatch({ type: "FETCH_FAIL", payload: error.message });
       }
@@ -302,15 +305,15 @@ export default function AppointmentBookingScreen() {
   }, [
     id,
     userInfo,
-    appointmentToUpdate.appointmentTitle,
-    appointmentToUpdate.contactNumber,
-    appointmentToUpdate.email,
-    appointmentToUpdate.endingTime,
-    appointmentToUpdate.meetingType,
-    appointmentToUpdate.name,
-    appointmentToUpdate.startingTime,
-    appointmentToUpdate.appointmentDate,
-    appointment.value,
+    appointmentToUpdate?.appointmentTitle,
+    appointmentToUpdate?.contactNumber,
+    appointmentToUpdate?.email,
+    appointmentToUpdate?.endingTime,
+    appointmentToUpdate?.meetingType,
+    appointmentToUpdate?.name,
+    appointmentToUpdate?.startingTime,
+    appointmentToUpdate?.appointmentDate,
+    appointment?.value,
   ]);
 
   return (

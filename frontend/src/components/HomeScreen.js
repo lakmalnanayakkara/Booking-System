@@ -4,7 +4,7 @@ import { Store } from "../Store";
 import axios from "axios";
 import LoadingBox from "../utils/LoadingBox";
 import MessageBox from "../utils/MessageBox";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import Appointment from "../utils/Appointment";
 
 const reducer = (state, action) => {

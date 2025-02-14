@@ -66,7 +66,7 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
 
     @Override
     public AppointmentsPaginatedDTO getAllAppointments(int pageNumber) {
-        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAll(PageRequest.of(pageNumber,1));
+        Page<AppointmentDetails> appointmentDetails = appointmentDetailsRepository.findAll(PageRequest.of(pageNumber,5));
         long total = appointmentDetailsRepository.count();
         if(appointmentDetails.getSize()>0){
             List<BookAppointmentResponseDTO> bookAppointmentResponseDTOList = appointmentDetailsMapper.pageableAppointmentDetailsToBookAppointmentResponseDTOList(appointmentDetails);
