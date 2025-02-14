@@ -51,7 +51,6 @@ export default function HomeScreen() {
               payload: data.data.appointments,
             });
           } else {
-            console.log(page);
             dispatch({ type: "FETCH_REQUEST" });
             const { data } = await axios.get(
               `/api/v1/appointment/get-all-appointments?page=${page}`,
@@ -61,7 +60,6 @@ export default function HomeScreen() {
                 },
               }
             );
-            console.log(data);
 
             dispatch({
               type: "FETCH_SUCCESS",
