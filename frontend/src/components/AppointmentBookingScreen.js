@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useReducer, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import axios from "axios";
 import { Store } from "../Store";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingBox from "../utils/LoadingBox";
 import MessageBox from "../utils/MessageBox";
@@ -21,6 +21,7 @@ const reducer = (state, action) => {
 };
 
 export default function AppointmentBookingScreen() {
+  const navigate = useNavigate();
   const params = useParams();
   const { id } = params;
   const [{ loading, error, appointmentToUpdate }, dispatch] = useReducer(
@@ -202,6 +203,7 @@ export default function AppointmentBookingScreen() {
         }
       );
       toast.success(`${data.data.appointmentTitle} updated successfully`);
+      navigate("/");
     } catch (error) {
       toast.error(error.message);
     }

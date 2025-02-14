@@ -43,6 +43,9 @@ public class AppointmentDetailsServiceIMPL implements AppointmentDetailsService 
             appointmentDetails.setEmail(bookAppointmentDTO.getEmail());
             appointmentDetails.setContactNumber(bookAppointmentDTO.getContactNumber());
             appointmentDetails.setMeetingType(bookAppointmentDTO.getMeetingType());
+            appointmentDetails.setStartingTime(bookAppointmentDTO.getStartingTime());
+            appointmentDetails.setEndingTime(bookAppointmentDTO.getEndingTime());
+            appointmentDetails.setAppointmentDate(bookAppointmentDTO.getAppointmentDate());
 
             appointmentDetailsRepository.save(appointmentDetails);
             BookAppointmentResponseDTO bookAppointmentResponseDTO = appointmentDetailsMapper.appointmentDetailsToBookAppointmentResponseDTO(appointmentDetails);
